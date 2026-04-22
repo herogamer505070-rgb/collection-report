@@ -5,6 +5,8 @@ import { formatCurrency } from "@/lib/format/currency";
 import { formatDate, formatDateTime } from "@/lib/format/dates";
 import type { CaseDetail } from "@/types/cases";
 import { AssignCollectorWidget } from "./assign-collector-widget";
+import { RecordPaymentDialog } from "./record-payment-dialog";
+import { EditCustomerDialog } from "./edit-customer-dialog";
 
 interface CaseSummaryProps {
   caseDetail: CaseDetail;
@@ -39,7 +41,14 @@ export function CaseSummary({ caseDetail: c, canAssign }: CaseSummaryProps) {
       {/* Customer card */}
       <Card>
         <CardHeader className="pb-3">
-          <CardTitle className="text-base">بيانات العميل</CardTitle>
+          <div className="flex items-center justify-between">
+            <CardTitle className="text-base">بيانات العميل</CardTitle>
+            <EditCustomerDialog
+              customerId={c.customer.id}
+              initialName={c.customer.name}
+              initialPhone={c.customer.phoneE164}
+            />
+          </div>
         </CardHeader>
         <CardContent className="space-y-4">
           <InfoRow label="الاسم" value={c.customer.name} />
@@ -49,11 +58,7 @@ export function CaseSummary({ caseDetail: c, canAssign }: CaseSummaryProps) {
             ltr
           />
           {c.customer.alternatePhone && (
-            <InfoRow
-              label="رقم بديل"
-              value={c.customer.alternatePhone}
-              ltr
-            />
+            <InfoRow label="رقم بديل" value={c.customer.alternatePhone} ltr />
           )}
           {c.customer.nationalId && (
             <InfoRow label="الرقم القومي" value={c.customer.nationalId} ltr />
@@ -98,10 +103,20 @@ export function CaseSummary({ caseDetail: c, canAssign }: CaseSummaryProps) {
           <InfoRow
             label="الرصيد المتبقي"
             value={
-              <span className={c.balance > 0 ? "text-destructive" : "text-green-600"}>
+              <span
+                className={
+                  c.balance > 0 ? "text-destructive" : "text-green-600"
+                }
+              >
                 {formatCurrency(c.balance, c.currencyCode)}
               </span>
             }
+          />
+          <RecordPaymentDialog
+            caseId={c.id}
+            amountDue={c.amountDue}
+            amountPaid={c.amountPaid}
+            currencyCode={c.currencyCode}
           />
           <Separator />
           <InfoRow label="تاريخ الاستحقاق" value={formatDate(c.dueDate)} />
@@ -124,7 +139,10 @@ export function CaseSummary({ caseDetail: c, canAssign }: CaseSummaryProps) {
           <InfoRow label="رقم العقد" value={c.contractNumber} ltr />
           <InfoRow label="رقم الحالة الخارجي" value={c.externalCaseId} ltr />
           <Separator />
-          <InfoRow label="آخر تواصل" value={formatDateTime(c.lastContactedAt)} />
+          <InfoRow
+            label="آخر تواصل"
+            value={formatDateTime(c.lastContactedAt)}
+          />
           <InfoRow label="تاريخ الإنشاء" value={formatDate(c.createdAt)} />
           <InfoRow label="آخر تحديث" value={formatDate(c.updatedAt)} />
           {/* Collector assignment */}

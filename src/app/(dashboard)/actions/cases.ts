@@ -138,17 +138,24 @@ export async function getChartData(): Promise<ChartData> {
   };
   for (const r of rows) {
     const s = r.status as CaseStatus;
-    const existing = statusMap.get(s) ?? { label: statusLabels[s], count: 0, amount: 0 };
-    const balance = Math.max(0, Number(r.amount_due ?? 0) - Number(r.amount_paid ?? 0));
+    const existing = statusMap.get(s) ?? {
+      label: statusLabels[s],
+      count: 0,
+      amount: 0,
+    };
+    const balance = Math.max(
+      0,
+      Number(r.amount_due ?? 0) - Number(r.amount_paid ?? 0),
+    );
     statusMap.set(s, {
       ...existing,
       count: existing.count + 1,
       amount: existing.amount + balance,
     });
   }
-  const statusDistribution: StatusDistribution[] = Array.from(statusMap.entries()).map(
-    ([status, v]) => ({ status, ...v }),
-  );
+  const statusDistribution: StatusDistribution[] = Array.from(
+    statusMap.entries(),
+  ).map(([status, v]) => ({ status, ...v }));
 
   // --- Aging buckets (days overdue for non-paid rows) ---
   const agingDefs: { label: string; minDays: number; maxDays: number }[] = [
@@ -170,7 +177,10 @@ export async function getChartData(): Promise<ChartData> {
       (d) => daysOverdue >= d.minDays && daysOverdue <= d.maxDays,
     );
     if (bucket) {
-      const balance = Math.max(0, Number(r.amount_due ?? 0) - Number(r.amount_paid ?? 0));
+      const balance = Math.max(
+        0,
+        Number(r.amount_due ?? 0) - Number(r.amount_paid ?? 0),
+      );
       agingAccum[bucket.label].amount += balance;
       agingAccum[bucket.label].count += 1;
     }
@@ -183,10 +193,18 @@ export async function getChartData(): Promise<ChartData> {
     if (r.status === "paid") continue;
     const proj = r.project_name ?? "غير محدد";
     const existing = projectMap.get(proj) ?? { amount: 0, cases: 0 };
-    const balance = Math.max(0, Number(r.amount_due ?? 0) - Number(r.amount_paid ?? 0));
-    projectMap.set(proj, { amount: existing.amount + balance, cases: existing.cases + 1 });
+    const balance = Math.max(
+      0,
+      Number(r.amount_due ?? 0) - Number(r.amount_paid ?? 0),
+    );
+    projectMap.set(proj, {
+      amount: existing.amount + balance,
+      cases: existing.cases + 1,
+    });
   }
-  const outstandingByProject: OutstandingByProject[] = Array.from(projectMap.entries())
+  const outstandingByProject: OutstandingByProject[] = Array.from(
+    projectMap.entries(),
+  )
     .map(([project, v]) => ({ project, ...v }))
     .sort((a, b) => b.amount - a.amount)
     .slice(0, 8);
@@ -270,9 +288,10 @@ export async function getPaginatedCases(
 
   const rows: CaseRow[] = (data ?? []).map((r) => {
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    const customer = (r as any).customers as
-      | { name: string | null; phone_e164: string | null }
-      | null;
+    const customer = (r as any).customers as {
+      name: string | null;
+      phone_e164: string | null;
+    } | null;
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
     const notes = (r as any).case_notes as
       | { note: string; created_at: string }[]
@@ -360,10 +379,7 @@ export async function getCaseDetails(
   if (error || !c) return null;
 
   // Collector scoping — collectors may only view their assigned case
-  if (
-    ctx.user.role === "collector" &&
-    c.assigned_to_user_id !== ctx.user.id
-  ) {
+  if (ctx.user.role === "collector" && c.assigned_to_user_id !== ctx.user.id) {
     return null;
   }
 
@@ -480,7 +496,8 @@ export async function createCaseNote(
   caseId: string,
   note: string,
 ): Promise<ActionResult<NoteRow>> {
-  if (!note.trim()) return { ok: false, error: "الملاحظة لا يمكن أن تكون فارغة." };
+  if (!note.trim())
+    return { ok: false, error: "الملاحظة لا يمكن أن تكون فارغة." };
 
   const ctx = await getRequiredCompanyContext();
   requirePermission(ctx.user, "notes.create");
@@ -651,4 +668,72 @@ export async function getCompanyUsers(): Promise<CompanyUser[]> {
     email: emailMap.get(d.user_id) ?? null,
     role: d.role as import("@/types/domain").UserRole,
   }));
+}
+
+// ---------------------------------------------------------------------------
+// Record payment
+// ---------------------------------------------------------------------------
+
+export async function recordPayment(
+  caseId: string,
+  paymentAmount: number,
+): Promise<{ error?: string }> {
+  const ctx = await getRequiredCompanyContext();
+  const admin = createAdminClient();
+
+  const { data: c, error: fetchErr } = await admin
+    .from("collection_cases")
+    .select("id, company_id, amount_due, amount_paid")
+    .eq("id", caseId)
+    .eq("company_id", ctx.companyId)
+    .single();
+
+  if (fetchErr || !c) return { error: "الحالة غير موجودة" };
+
+  const newPaid = Number(c.amount_paid) + paymentAmount;
+  const amountDue = Number(c.amount_due);
+
+  let status: CaseStatus;
+  if (newPaid >= amountDue) status = "paid";
+  else if (newPaid > 0) status = "partial";
+  else status = "pending";
+
+  const { error } = await admin
+    .from("collection_cases")
+    .update({ amount_paid: newPaid, status })
+    .eq("id", caseId)
+    .eq("company_id", ctx.companyId);
+
+  if (error) return { error: "فشل تسجيل الدفع" };
+
+  revalidatePath(`/cases/${caseId}`);
+  revalidatePath("/cases");
+  revalidatePath("/dashboard");
+  return {};
+}
+
+// ---------------------------------------------------------------------------
+// Update customer
+// ---------------------------------------------------------------------------
+
+export async function updateCustomer(
+  customerId: string,
+  data: { name: string | null; phone: string | null },
+): Promise<{ error?: string }> {
+  const ctx = await getRequiredCompanyContext();
+  const admin = createAdminClient();
+
+  const { error } = await admin
+    .from("customers")
+    .update({
+      name: data.name || null,
+      phone_e164: data.phone || null,
+    })
+    .eq("id", customerId)
+    .eq("company_id", ctx.companyId);
+
+  if (error) return { error: "فشل تحديث بيانات العميل" };
+
+  revalidatePath("/cases");
+  return {};
 }
