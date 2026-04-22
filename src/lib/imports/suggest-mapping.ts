@@ -10,11 +10,17 @@ const FIELD_PATTERNS: FieldPattern[] = [
     field: "customerName",
     patterns: [
       /اسم.*عميل/i,
+      /عميل.*اسم/i,
       /client.*name/i,
       /customer.*name/i,
       /^name$/i,
       /^اسم$/i,
       /^العميل$/i,
+      /^اسم العميل$/i,
+      /^الاسم$/i,
+      /^الاسم الكامل$/i,
+      /^صاحب العقد$/i,
+      /^المالك$/i,
     ],
   },
   {

@@ -6,6 +6,26 @@ import { validateRow } from "./validate-row";
 
 const CHUNK_SIZE = 100;
 
+type CaseStatus = "pending" | "paid" | "partial" | "overdue" | "invalid";
+
+function deriveStatus(
+  amountDue: number,
+  amountPaid: number,
+  dueDate: string | null,
+): CaseStatus {
+  if (amountDue <= 0) return "invalid";
+  if (amountPaid >= amountDue) return "paid";
+  if (amountPaid > 0) return "partial";
+  // amountPaid === 0
+  if (dueDate) {
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const due = new Date(dueDate);
+    if (due < today) return "overdue";
+  }
+  return "pending";
+}
+
 function generateFingerprint(companyId: string, row: NormalizedRow): string {
   const parts = [
     companyId,
@@ -150,6 +170,7 @@ export async function upsertBatch(
         amount_paid: row.amountPaid,
         payment_type: row.paymentType,
         due_date: row.dueDate,
+        status: deriveStatus(row.amountDue, row.amountPaid, row.dueDate),
         raw_row: row.rawRow as unknown as Json,
       };
 
