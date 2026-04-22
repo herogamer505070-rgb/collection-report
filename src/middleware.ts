@@ -28,10 +28,17 @@ export async function middleware(request: NextRequest) {
   } = await supabase.auth.getUser();
   const { pathname } = request.nextUrl;
 
-  const isDashboard = pathname.startsWith("/dashboard");
+  const protectedPrefixes = [
+    "/dashboard",
+    "/cases",
+    "/upload",
+    "/settings",
+    "/team",
+  ];
+  const isProtected = protectedPrefixes.some((p) => pathname.startsWith(p));
   const isAuthPage = pathname.startsWith("/login");
 
-  if (isDashboard && !user) {
+  if (isProtected && !user) {
     const url = request.nextUrl.clone();
     url.pathname = "/login";
     return NextResponse.redirect(url);
