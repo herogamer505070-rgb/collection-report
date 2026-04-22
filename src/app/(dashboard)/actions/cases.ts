@@ -528,7 +528,7 @@ export async function createCaseNote(
     metadata: { caseId },
   });
 
-  revalidatePath(`/dashboard/cases/${caseId}`);
+  revalidatePath(`/cases/${caseId}`);
 
   return {
     ok: true,
@@ -569,7 +569,7 @@ export async function deleteCaseNote(
     metadata: { caseId },
   });
 
-  revalidatePath(`/dashboard/cases/${caseId}`);
+  revalidatePath(`/cases/${caseId}`);
   return { ok: true, data: undefined };
 }
 
@@ -612,8 +612,8 @@ export async function assignCaseCollector(
     afterState: { assignedToUserId },
   });
 
-  revalidatePath(`/dashboard/cases/${caseId}`);
-  revalidatePath("/dashboard/cases");
+  revalidatePath(`/cases/${caseId}`);
+  revalidatePath("/cases");
   return { ok: true, data: undefined };
 }
 

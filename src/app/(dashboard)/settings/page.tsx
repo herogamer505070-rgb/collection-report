@@ -35,7 +35,7 @@ export default async function SettingsPage() {
 
       <div className="grid gap-4 md:grid-cols-2 lg:grid-cols-3">
         {canManageTeam && (
-          <Link href="/dashboard/settings/team">
+          <Link href="/settings/team">
             <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/50">
               <CardHeader>
                 <Users className="h-8 w-8 text-primary mb-2" />
@@ -49,7 +49,7 @@ export default async function SettingsPage() {
         )}
 
         {canManageWhatsApp && (
-          <Link href="/dashboard/settings/whatsapp">
+          <Link href="/settings/whatsapp">
             <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/50">
               <CardHeader>
                 <MessageCircle className="h-8 w-8 text-primary mb-2" />
@@ -63,7 +63,7 @@ export default async function SettingsPage() {
         )}
 
         {canReadAudit && (
-          <Link href="/dashboard/settings/audit">
+          <Link href="/settings/audit">
             <Card className="h-full transition-colors hover:border-primary/50 hover:bg-muted/50">
               <CardHeader>
                 <Shield className="h-8 w-8 text-primary mb-2" />

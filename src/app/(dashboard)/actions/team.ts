@@ -132,7 +132,7 @@ export async function inviteTeamMember(
     afterState: { email, role },
   });
 
-  revalidatePath("/dashboard/team");
+  revalidatePath("/team");
   return { ok: true, data: { email } };
 }
 
@@ -183,7 +183,7 @@ export async function updateTeamMemberRole(
     afterState: { role },
   });
 
-  revalidatePath("/dashboard/team");
+  revalidatePath("/team");
   return { ok: true, data: undefined };
 }
 
@@ -226,7 +226,7 @@ export async function setTeamMemberActive(
     afterState: { isActive },
   });
 
-  revalidatePath("/dashboard/team");
+  revalidatePath("/team");
   return { ok: true, data: undefined };
 }
 

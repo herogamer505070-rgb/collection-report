@@ -40,7 +40,7 @@ export default async function DashboardPage() {
             variant="outline"
             size="sm"
             id="dashboard-upload-link"
-            render={<Link href="/dashboard/upload" />}
+            render={<Link href="/upload" />}
           >
             <Upload className="me-2 h-4 w-4" />
             رفع بيانات
@@ -48,7 +48,7 @@ export default async function DashboardPage() {
           <Button
             size="sm"
             id="dashboard-cases-link"
-            render={<Link href="/dashboard/cases" />}
+            render={<Link href="/cases" />}
           >
             عرض جميع الحالات
             <ArrowLeft className="ms-2 h-4 w-4" />

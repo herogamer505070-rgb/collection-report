@@ -51,7 +51,7 @@ export default async function CaseDetailPage({
       {/* Breadcrumb */}
       <nav className="flex items-center gap-1 text-sm text-muted-foreground" aria-label="مسار التنقل">
         <Link
-          href="/dashboard/cases"
+          href="/cases"
           className="transition-colors hover:text-foreground"
         >
           حالات التحصيل

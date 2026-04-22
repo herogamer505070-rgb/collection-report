@@ -25,9 +25,9 @@ export function Topbar({ user }: TopbarProps) {
   // Simple title mapping
   const getPageTitle = () => {
     if (pathname === "/dashboard") return "لوحة المؤشرات";
-    if (pathname.startsWith("/dashboard/cases")) return "حالات التحصيل";
-    if (pathname.startsWith("/dashboard/upload")) return "رفع بيانات";
-    if (pathname.startsWith("/dashboard/settings")) return "الإعدادات";
+    if (pathname.startsWith("/cases")) return "حالات التحصيل";
+    if (pathname.startsWith("/upload")) return "رفع بيانات";
+    if (pathname.startsWith("/settings")) return "الإعدادات";
     return "";
   };
 

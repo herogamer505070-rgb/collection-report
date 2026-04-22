@@ -25,7 +25,7 @@ export default function CasesPage() {
               إدارة ومتابعة جميع حالات التحصيل
             </p>
           </div>
-          <Button variant="outline" size="sm" id="cases-upload-link" render={<Link href="/dashboard/upload" />}>
+          <Button variant="outline" size="sm" id="cases-upload-link" render={<Link href="/upload" />}>
             <Upload className="me-2 h-4 w-4" />
             رفع بيانات جديدة
           </Button>

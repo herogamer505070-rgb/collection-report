@@ -92,7 +92,7 @@ export async function connectWhatsAppConfig(
     afterState: { phoneNumberId, displayPhone: verification.displayPhone, verifiedName: verification.verifiedName },
   });
 
-  revalidatePath("/dashboard/settings/whatsapp");
+  revalidatePath("/settings/whatsapp");
   return {
     success: true,
     displayPhone: verification.displayPhone ?? phoneNumberId,
@@ -133,7 +133,7 @@ export async function disconnectWhatsAppConfig(): Promise<DisconnectWhatsAppResu
     beforeState: { phoneNumberId: current?.phone_number_id ?? null, displayPhone: current?.display_phone_number ?? null },
   });
 
-  revalidatePath("/dashboard/settings/whatsapp");
+  revalidatePath("/settings/whatsapp");
   return { success: true };
 }
 
@@ -295,6 +295,6 @@ export async function sendWhatsAppMessage(input: {
     .eq("id", caseId)
     .eq("company_id", ctx.companyId);
 
-  revalidatePath(`/dashboard/cases/${caseId}`);
+  revalidatePath(`/cases/${caseId}`);
   return { ok: true, data: { logId, messageId: sendResult.messageId } };
 }

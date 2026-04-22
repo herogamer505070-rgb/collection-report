@@ -28,7 +28,7 @@ export function CaseRowActions({ row }: CaseRowActionsProps) {
       </DropdownMenuTrigger>
       <DropdownMenuContent align="start">
         <DropdownMenuItem
-          onClick={() => router.push(`/dashboard/cases/${row.id}`)}
+          onClick={() => router.push(`/cases/${row.id}`)}
           id={`case-view-${row.id}`}
         >
           <FileText className="me-2 h-4 w-4" />
@@ -36,7 +36,7 @@ export function CaseRowActions({ row }: CaseRowActionsProps) {
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() =>
-            router.push(`/dashboard/cases/${row.id}?action=note`)
+            router.push(`/cases/${row.id}?action=note`)
           }
           id={`case-note-${row.id}`}
         >
@@ -45,7 +45,7 @@ export function CaseRowActions({ row }: CaseRowActionsProps) {
         </DropdownMenuItem>
         <DropdownMenuItem
           onClick={() =>
-            router.push(`/dashboard/cases/${row.id}?action=whatsapp`)
+            router.push(`/cases/${row.id}?action=whatsapp`)
           }
           disabled={!row.phoneE164}
           id={`case-whatsapp-${row.id}`}

@@ -11,7 +11,7 @@ interface KpiCardProps {
   title: string;
   value: string;
   subtitle?: string;
-  /** When provided, clicking applies this status filter on /dashboard/cases */
+  /** When provided, clicking applies this status filter on /cases */
   filterStatus?: string;
   className?: string;
 }
@@ -25,9 +25,9 @@ function KpiCard({ title, value, subtitle, filterStatus, className }: KpiCardPro
   const handleClick = () => {
     if (!filterStatus) return;
     const target =
-      pathname.startsWith("/dashboard/cases")
-        ? `/dashboard/cases?status=${filterStatus}`
-        : `/dashboard/cases?status=${filterStatus}`;
+      pathname.startsWith("/cases")
+        ? `/cases?status=${filterStatus}`
+        : `/cases?status=${filterStatus}`;
     router.push(target);
   };
 

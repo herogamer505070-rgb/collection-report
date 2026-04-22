@@ -230,7 +230,7 @@ export async function runImport(
   });
 
   revalidatePath("/dashboard");
-  revalidatePath("/dashboard/cases");
+  revalidatePath("/cases");
 
   return { ok: true, summary };
 }
