@@ -6,6 +6,8 @@ export const maxDuration = 60;
 
 // Common Arabic/English column names for customer name in Excel files
 const NAME_KEYS = [
+  "Customer",
+  "customer",
   "اسم العميل",
   "العميل",
   "الاسم",
@@ -27,9 +29,9 @@ function extractName(rawRow: Record<string, unknown>): string | null {
       return String(val).trim();
     }
   }
-  // Fuzzy: find any key containing "اسم" or "name"
+  // Fuzzy: find any key containing "اسم" or "name" or "customer"
   for (const key of Object.keys(rawRow)) {
-    if (/اسم|name/i.test(key)) {
+    if (/اسم|name|customer|client/i.test(key)) {
       const val = rawRow[key];
       if (val != null && String(val).trim() !== "") {
         return String(val).trim();
@@ -82,8 +84,7 @@ export async function GET(request: Request) {
     const { error: updateErr } = await admin
       .from("customers")
       .update({ name })
-      .eq("id", c.customer_id)
-      .is("name", null); // only update if name is still null
+      .eq("id", c.customer_id);
 
     if (!updateErr) updated++;
   }
